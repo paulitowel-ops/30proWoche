@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Plant30 Ultimate V21</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         /* Verhindert, dass die Tastatur das Layout zerschießt */
         html, body { height: 100%; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
@@ -126,7 +127,8 @@
         };
 
         let state = {
-            items: [], history: [], darkMode: false, lastWeek: "", showDetails: false
+    items: [], history: [], darkMode: false, lastWeek: "", showDetails: false, lastMilestone: 0
+};
         };
 
         // LOAD DATA
@@ -240,6 +242,21 @@
         function render() {
             document.documentElement.classList.toggle('dark', state.darkMode);
             const score = state.items.length;
+            // Konfetti-Logik bei jedem 10er Schritt
+if (score > 0 && score % 10 === 0 && state.lastMilestone !== score) {
+    confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#16a34a', '#fbbf24', '#ffffff'] // Grün, Gold, Weiß
+    });
+    state.lastMilestone = score;
+    save();
+}
+// Setzt den Meilenstein zurück, falls man Dinge löscht
+if (score < state.lastMilestone) {
+    state.lastMilestone = Math.floor(score / 10) * 10;
+}
             document.getElementById('score').innerText = score;
             document.getElementById('weekDisplay').innerText = "Woche " + (state.lastWeek || "--");
 
